@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #drag {
+            width: 200px;
+            height: 200px;
+            display: inline-block;
+            background: lightblue;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好
+        你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好
+        你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好
+        你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好
+        你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好
+        你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好
+        你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好你好</div>
+    <div id="drag"></div>
+
+
+    <script>
+        let container = document.getElementById('container');
+        let content = container.childNodes[0];
+        let drag = document.getElementById('drag');
+
+        let ranges = [];
+        let baseX = 0, baseY = 0;
+        drag.addEventListener('mousedown', (e) => {
+            let startX = e.clientX; 
+            let startY = e.clientY;
+            console.log(startX, startY)
+
+            let move = e => {
+                let x = baseX + e.clientX - startX; 
+                let y = baseY + e.clientY - startY;
+                console.log(x, y);
+                drag.style.transform = `translate(${x}px, ${y}px)`;
+                neareastRange(x, y).insertNode(drag)
+            }
+
+            let up = e => {
+                baseX = baseX + e.clientX - startX;
+                baseY = baseY + e.clientY - startY;
+                document.removeEventListener('mouseover', move);
+                document.removeEventListener('mouseup', up);
+            }
+
+            document.addEventListener('mouseover', move);
+            document.addEventListener('mouseup', up)
+        })
+
+        for (let i = 0; i < content.length; i++) {
+            let range = document.createRange();
+            range.setStart(content, i);
+            range.setEnd(content, i);
+            ranges.push(range)
+        }
+
+        function neareastRange(x0, y0) {
+            let d = Infinity;
+            let rangeChoose = null;
+            for(let range of ranges) {
+                let {x, y} = range.getBoundingClientRect();
+                console.log(x, y);
+                if (d > (x0 - x) ** 2 + (y0 - y) **2) {
+                    d = (x0 - x) ** 2 + (y0 - y) **2;
+                    rangeChoose = range;
+                }
+            }
+            return rangeChoose;
+        }
+
+
+    </script>
+</body>
+</html>

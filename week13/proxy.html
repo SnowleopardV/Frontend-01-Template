@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        let obj = {
+            a: 1, 
+            b: 2
+        }
+        let p = new Proxy(obj, {
+            get(obj, prop) {
+                console.log(obj, prop, obj[prop]);
+                return obj[prop] + 100;
+            },
+            set(obj, prop, value) {
+                console.log(obj, prop, value);
+                obj[prop] = value
+            },
+            setPrototypeOf(obj, prototype) {
+                console.log(obj, prototype);
+                return Object.setPrototypeOf(obj, prototype);
+            },
+            defineProperty(obj, prop, options) {
+                console.log(obj, prop, options);
+                console.log(arguments)
+                Object.defineProperty(obj, prop, options);
+                return true
+            }
+        })
+
+        p.a 
+        p.b = 4;
+        Object.setPrototypeOf(p, null);
+        Object.defineProperty(p, 'a', {value: 100})
+    </script>
+</body>
+</html>

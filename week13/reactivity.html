@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #container {
+            width: 200px;
+            height: 200px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="range" id="r" min=0 max=255 />
+    <input type="range" id="g" min=0 max=255 />
+    <input type="range" id="b" min=0 max=255 />
+
+    <div id="container"></div>
+
+    <script>
+        let obj = {
+            name: 'lilei',
+            age: 20,
+            a: 10,
+            b: 1
+        };
+        let dummy = 0;
+        let dummy1 = 0;
+        let handles = new Map();
+        let reactivities = new Map();
+        let usedActivities = [];
+
+        function reactivity(obj) {
+            if (reactivities.has(obj))
+                return reactivities.get(obj)
+            let p = new Proxy(obj, {
+                get(obj, prop) {
+                    usedActivities.push([obj, prop]);
+                    if (typeof obj[prop] == 'object')
+                        return reactivity(obj[prop])
+                    return obj[prop];
+                },
+                set(obj, prop, value) {
+                    obj[prop] = value;
+                    // for(let h of handles) {
+                    //     h();
+                    // }
+                    // 需要做依赖收集
+
+                    for (let h of handles.get(obj).get(prop))
+                        h();
+                }
+            })
+            reactivities.set(obj, p);
+            return p;
+        }
+
+        let p = reactivity(obj);
+
+        function effect(handle) {
+            usedActivities = [];
+            console.log(handle);
+            handle();
+            // 
+            for (let usedActivity of usedActivities) {
+                let [obj, prop] = usedActivity;
+                if (!handles.has(obj))
+                    handles.set(obj, new Map());
+                if (!handles.get(obj).has(prop))
+                    handles.get(obj).set(prop, [])
+                handles.get(obj).get(prop).push(handle)
+            }
+        }
+
+        function test() {
+            console.log(dummy, dummy1);
+            effect(() => dummy = p.a);
+            effect(() => dummy1 = p.a)
+            p.a = 10000;
+            console.log(dummy, dummy1)
+        }
+
+        function test2() {
+            let num1 = 0;
+            let num2 = 0;
+            let num12 = 0;
+            let p = reactivity({
+                a: 1
+            });
+            let p1 = reactivity({
+                a: 10
+            });
+
+            console.log(num1, num2, num12)
+            effect(() => num1 = p.a);
+            effect(() => num2 = p1.a);
+            effect(() => num12 = p.a + p1.a);
+
+            console.log(num1, num2, num12);
+            // 1. 
+            p.a = 100;
+            console.log(num1, num2, num12);
+
+            // 2. 
+            p1.a = 2;
+            console.log(num1, num2, num12);
+
+        }
+
+        function test3() {
+            let p = reactivity({
+                a: {
+                    x: 1
+                }
+            });
+            let v = 0;
+            console.log(v)
+            effect(() => v = p.a.x);
+            p.a.x = 9;
+            console.log(v)
+        }
+        p = reactivity({
+            r: 255,
+            g: 255,
+            b: 255
+        })
+        effect(() => {
+            document.getElementById('r').value = p.r;
+        });
+        effect(() => {
+            document.getElementById('g').value = p.g;
+        });
+        effect(() => {
+            document.getElementById('b').value = p.b;
+        });
+        effect(() => {
+            document.getElementById("container").style.background = `rgb(${p.r}, ${p.g}, ${p.b})`
+        });
+
+        document.getElementById('r').addEventListener('input', (e) => {
+            p.r = e.target.value
+        });
+        document.getElementById('g').addEventListener('input', (e) => {
+            p.g = e.target.value
+        });
+        document.getElementById('b').addEventListener('input', (e) => {
+            p.b = e.target.value
+        });
+    </script>
+</body>
+
+</html>
