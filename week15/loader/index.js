@@ -1,0 +1,1 @@
+import carousel from './carousel.view'

@@ -1,0 +1,54 @@
+<style>
+    .carousel {
+        width: 536px;
+        height: 300px;
+        border: 1px solid black;
+        white-space: nowrap;
+        overflow: hidden;
+        /* zoom: 0.3; */
+        margin: auto;
+    }
+    .carousel img {
+        height: 300px;
+        width: 536px;
+        display: inline-block;
+        transition: transform ease 0.5s;
+    }
+    #el {
+        width: 200px;
+        height: 200px;
+        background: skyblue;
+    }
+    #el2 {
+        width: 200px;
+        height: 200px;
+        background: skyblue;
+    }
+    #el3, #el4 {
+        width: 200px;
+        height: 200px;
+    }
+    #el4 {
+        background: pink;
+    }
+</style>
+<body>
+    <div id="el"></div>
+    <div id="el2"></div>
+    <div id="el4"></div>
+    <div id="el3"></div>
+
+    <button id="btn" onclick="start()">start</button>
+    <button id="btn1" onclick="stop()">stop</button>
+    <button id="btn2">pause</button>
+    <button id="btn3">resume</button>
+    <button id="btn4">restart</button>
+    <button id="btn5">addAnimation</button>
+    <button id="btn6">fastfoward</button>
+</body>
+<!-- <script src="./startCssAnimation.js"></script>
+<script src="./stopCssAnimation.js"></script> -->
+<!-- <script src="./animation.js"></script>
+<script src="./timeline.js"></script>
+<script src="./index.js"></script> -->
+<script src="./main.js"></script>
